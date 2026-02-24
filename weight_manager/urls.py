@@ -5,6 +5,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', include('core.urls')), # 引入 core 应用的路由
 ]
 
 if settings.DEBUG:
