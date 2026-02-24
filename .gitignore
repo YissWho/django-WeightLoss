@@ -1,0 +1,31 @@
+# 虚拟环境
+venv/
+.venv/
+env/
+
+# Python 缓存
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyc
+*$py.class
+
+# Django 相关
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# 媒体文件（用户上传）
+media/
+
+# 静态文件收集目录（collectstatic 生成的）
+staticfiles/
+static_root/
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# VSCode
+.vscode/
