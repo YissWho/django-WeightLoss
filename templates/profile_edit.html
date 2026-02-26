@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}资料修改 - 减肥打卡系统{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="mb-0 fw-bold">⚙️ 个人资料设置</h3>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-4 p-md-5">
+                
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-3" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="row mb-5 align-items-center">
+                        <div class="col-auto">
+                            {% if profile.avatar %}
+                                <img src="{{ profile.avatar.url }}" alt="当前头像" class="rounded-circle border border-3 border-light shadow-sm" style="width: 100px; height: 100px; object-fit: cover;" id="avatarPreview">
+                            {% endif %}
+                        </div>
+                        <div class="col">
+                            <label for="avatarInput" class="form-label fw-bold text-muted">更换头像</label>
+                            <input class="form-control bg-light border-0" type="file" id="avatarInput" name="avatar" accept="image/*">
+                            <div class="form-text">支持 JPG, PNG 格式，建议正方形图片。</div>
+                        </div>
+                    </div>
+
+                    <hr class="text-muted mb-4">
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-muted">用户名 (不可修改)</label>
+                            <input type="text" class="form-control bg-light border-0 text-muted" value="{{ request.user.username }}" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-muted">性别</label>
+                            <select class="form-select bg-light border-0" name="gender">
+                                <option value="M" {% if profile.gender == 'M' %}selected="selected"{% endif %}>男</option>
+                                <option value="F" {% if profile.gender == 'F' %}selected="selected"{% endif %}>女</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row g-4 mb-5">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-muted">身高 (cm)</label>
+                            <input type="number" step="0.1" class="form-control bg-light border-0" name="height" value="{{ profile.height }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-muted">目标体重 (kg)</label>
+                            <input type="number" step="0.1" class="form-control bg-light border-0" name="target_weight" value="{{ profile.target_weight }}" required>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'home' %}" class="btn btn-light px-4 rounded-pill">取消返回</a>
+                        <button type="submit" class="btn btn-primary px-5 rounded-pill shadow-sm">保存修改</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4 mt-4 mt-lg-0">
+        <div class="card border-0 bg-primary bg-opacity-10 rounded-4">
+            <div class="card-body p-4 text-primary">
+                <h5 class="fw-bold mb-3">💡 贴士</h5>
+                <p class="mb-0">更新您的身高和目标体重后，系统将自动为您重新计算 <strong>BMI</strong> 指数以及减肥进度百分比。<br><br>保持数据的准确性有助于系统提供更科学的运动推荐！</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // 选中小功能：用户选择新头像后，实时预览图片
+    document.getElementById('avatarInput').addEventListener('change', function(event) {
+        const [file] = event.target.files;
+        if (file) {
+            document.getElementById('avatarPreview').src = URL.createObjectURL(file);
+        }
+    });
+</script>
+{% endblock %}

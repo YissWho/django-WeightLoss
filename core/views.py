@@ -65,3 +65,33 @@ def home_view(request):
 def logout_view(request):
     logout(request)
     return redirect('auth') # 退出后跳回登录页
+
+@login_required(login_url='/auth/')
+def profile_edit_view(request):
+    user = request.user
+    profile = user.userprofile
+
+    if request.method == 'POST':
+        # 1. 获取普通文本数据
+        gender = request.POST.get('gender')
+        height = request.POST.get('height')
+        target_weight = request.POST.get('target_weight')
+
+        # 2. 更新资料
+        profile.gender = gender
+        if height:
+            profile.height = float(height)
+        if target_weight:
+            profile.target_weight = float(target_weight)
+
+        # 3. 处理头像文件上传 (关键点：从 request.FILES 获取)
+        if 'avatar' in request.FILES:
+            profile.avatar = request.FILES['avatar']
+
+        # 4. 保存到数据库
+        profile.save()
+        messages.success(request, '个人资料与头像已成功更新！')
+        return redirect('profile_edit') # 更新后刷新当前页面
+
+    # GET 请求：渲染页面
+    return render(request, 'profile_edit.html', {'profile': profile})
