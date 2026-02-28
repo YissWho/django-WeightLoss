@@ -3,8 +3,12 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
-from .models import UserProfile
+from core.models import UserProfile,DailyRecord
 from django.contrib.auth.decorators import login_required
+from django.utils import timezone
+from datetime import timedelta
+
+# 登录注册视图（合并在一起，前端通过隐藏字段区分）
 def auth_view(request):
     # 如果用户已经登录，直接跳回首页
     if request.user.is_authenticated:
@@ -66,6 +70,7 @@ def logout_view(request):
     logout(request)
     return redirect('auth') # 退出后跳回登录页
 
+# 个人资料编辑视图（允许修改性别、身高、目标体重和头像）
 @login_required(login_url='/auth/')
 def profile_edit_view(request):
     user = request.user
@@ -95,3 +100,44 @@ def profile_edit_view(request):
 
     # GET 请求：渲染页面
     return render(request, 'profile_edit.html', {'profile': profile})
+
+# 打卡视图：每天记录体重、摄入热量、消耗热量和总结
+@login_required(login_url='/auth/')
+def check_in_view(request):
+    today = timezone.now().date()
+    user = request.user
+    has_checked_in = DailyRecord.objects.filter(user=user, date=today).exists()
+
+    if request.method == 'POST':
+        if has_checked_in:
+            messages.warning(request, '今日已完成打卡')
+            return redirect('check_in')
+
+        weight = request.POST.get('weight')
+        calories_in = request.POST.get('calories_in')
+        calories_out = request.POST.get('calories_out')
+        summary = request.POST.get('summary')
+
+        DailyRecord.objects.create(
+            user=user,
+            date=today,
+            weight=float(weight),
+            calories_in=int(calories_in),
+            calories_out=int(calories_out),
+            summary=summary
+        )
+
+        profile = user.userprofile
+        yesterday = today - timedelta(days=1)
+        
+        if DailyRecord.objects.filter(user=user, date=yesterday).exists():
+            profile.streak_count += 1
+        else:
+            profile.streak_count = 1
+            
+        profile.save()
+
+        messages.success(request, '打卡成功')
+        return redirect('home')
+
+    return render(request, 'check_in.html', {'has_checked_in': has_checked_in})

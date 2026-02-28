@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  每日打卡 - 减肥打卡系统
+{% endblock %}
+
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="mb-0 fw-bold">📝 每日打卡</h3>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4 p-md-5">
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-3" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+
+          {% if has_checked_in %}
+            <div class="text-center py-5">
+              <div class="mb-4">
+                <span class="display-1">🎉</span>
+              </div>
+              <h4 class="fw-bold text-success mb-3">今日打卡已完成</h4>
+              <p class="text-muted mb-4">自律是自由的边界，明天请继续保持！</p>
+              <a href="{% url 'home' %}" class="btn btn-primary px-4 rounded-pill">返回数据总览</a>
+            </div>
+          {% else %}
+            <form method="POST">
+              {% csrf_token %}
+              <div class="row g-4 mb-4">
+                <div class="col-md-12">
+                  <div class="form-floating">
+                    <input type="number" step="0.1" class="form-control bg-light border-0" name="weight" placeholder="当日体重" required />
+                    <label>当日体重 (kg)</label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-floating">
+                    <input type="number" class="form-control bg-light border-0" name="calories_in" placeholder="摄入热量" required />
+                    <label>总摄入热量 (kcal)</label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-floating">
+                    <input type="number" class="form-control bg-light border-0" name="calories_out" placeholder="消耗热量" required />
+                    <label>总运动消耗 (kcal)</label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-floating mb-5">
+                <textarea class="form-control bg-light border-0" name="summary" placeholder="心情小结" style="height: 120px"></textarea>
+                <label>减肥小结（今日心情、饮食细节等）</label>
+              </div>
+
+              <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <button type="submit" class="btn btn-primary px-5 py-2 rounded-pill shadow-sm fw-bold">提交今日打卡</button>
+              </div>
+            </form>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4 mt-4 mt-lg-0">
+      <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-header bg-primary bg-opacity-10 border-0 py-3 rounded-top-4">
+          <h5 class="mb-0 text-primary fw-bold">💡 常见食物热量参考</h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+              <thead class="table-light">
+                <tr class="small text-muted">
+                  <th class="ps-4">食物名称</th>
+                  <th>单位</th>
+                  <th class="pe-4 text-end">热量</th>
+                </tr>
+              </thead>
+              <tbody class="small">
+                <tr>
+                  <td class="ps-4">米饭</td>
+                  <td>100g</td>
+                  <td class="pe-4 text-end">116kcal</td>
+                </tr>
+                <tr>
+                  <td class="ps-4">馒头</td>
+                  <td>100g</td>
+                  <td class="pe-4 text-end">223kcal</td>
+                </tr>
+                <tr>
+                  <td class="ps-4">水煮蛋</td>
+                  <td>1个</td>
+                  <td class="pe-4 text-end">80kcal</td>
+                </tr>
+                <tr>
+                  <td class="ps-4">鸡胸肉</td>
+                  <td>100g</td>
+                  <td class="pe-4 text-end">133kcal</td>
+                </tr>
+                <tr>
+                  <td class="ps-4">苹果</td>
+                  <td>1个</td>
+                  <td class="pe-4 text-end">95kcal</td>
+                </tr>
+                <tr>
+                  <td class="ps-4">全脂牛奶</td>
+                  <td>250ml</td>
+                  <td class="pe-4 text-end">150kcal</td>
+                </tr>
+                <tr>
+                  <td class="ps-4">西兰花</td>
+                  <td>100g</td>
+                  <td class="pe-4 text-end">34kcal</td>
+                </tr>
+                <tr class="table-warning bg-opacity-10">
+                  <td class="ps-4">炸鸡腿</td>
+                  <td>100g</td>
+                  <td class="pe-4 text-end">260kcal</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card-footer bg-white border-0 py-3 rounded-bottom-4">
+          <p class="small text-muted mb-0">* 数据仅供参考，建议以包装袋标识为准。</p>
+        </div>
+      </div>
+
+      <div class="card border-0 bg-dark bg-opacity-10 rounded-4">
+        <div class="card-body p-4">
+          <h6 class="fw-bold mb-2">🏃 运动消耗参考</h6>
+          <p class="small text-muted mb-0">
+            慢跑 30分钟 ≈ 300kcal<br />
+            快走 30分钟 ≈ 150kcal<br />
+            跳绳 10分钟 ≈ 100kcal
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

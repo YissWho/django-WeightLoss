@@ -9,4 +9,5 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     # 个人信息编辑页
     path('profile/edit/', views.profile_edit_view, name='profile_edit'),
+    path('check_in/', views.check_in_view, name='check_in'),
 ]

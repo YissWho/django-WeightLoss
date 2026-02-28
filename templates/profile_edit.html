@@ -58,6 +58,11 @@
                             <label class="form-label fw-bold text-muted">身高 (cm)</label>
                             <input type="number" step="0.1" class="form-control bg-light border-0" name="height" value="{{ profile.height }}" required>
                         </div>
+												{% comment %} 增加初始体重 {% endcomment %}
+												<div class="col-md-6">
+														<label class="form-label fw-bold text-muted">初始体重 (kg)</label>
+														<input type="number" step="0.1" class="form-control bg-light border-0 disabled" name="initial_weight" value="{{ profile.initial_weight }}" disabled>
+												</div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold text-muted">目标体重 (kg)</label>
                             <input type="number" step="0.1" class="form-control bg-light border-0" name="target_weight" value="{{ profile.target_weight }}" required>
