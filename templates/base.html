@@ -57,7 +57,7 @@
                 <span class="text-muted small fw-bold text-uppercase mb-2 px-2">功能导航</span>
                 <a href="{% url 'home' %}" class="btn btn-light text-start sidebar-link py-2 {% if request.resolver_match.url_name == 'home' %}active{% endif %}">📊 数据总览</a>
                 <a href="{% url 'check_in' %}" class="btn btn-light text-start sidebar-link py-2 {% if request.resolver_match.url_name == 'check_in' %}active{% endif %}">每日打卡</a>
-                <a href="#" class="btn btn-light text-start sidebar-link py-2 {% if request.resolver_match.url_name == 'history' %}active{% endif %}">📈 历史记录</a>
+                <a href="{% url 'history' %}" class="btn btn-light text-start sidebar-link py-2 {% if request.resolver_match.url_name == 'history' or request.resolver_match.url_name == 'record_edit' %}active{% endif %}">历史记录</a>
                 <hr class="my-2 text-muted" />
                 <span class="text-muted small fw-bold text-uppercase mb-2 px-2">个人设置</span>
                 <a href="{% url 'profile_edit' %}" class="btn btn-light text-start sidebar-link py-2 {% if request.resolver_match.url_name == 'profile_edit' %}active{% endif %}">⚙️ 资料修改</a>

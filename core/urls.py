@@ -10,4 +10,7 @@ urlpatterns = [
     # 个人信息编辑页
     path('profile/edit/', views.profile_edit_view, name='profile_edit'),
     path('check_in/', views.check_in_view, name='check_in'),
+    path('history/', views.history_view, name='history'),
+    path('history/edit/<int:record_id>/', views.record_edit_view, name='record_edit'),
+    path('history/delete/<int:record_id>/', views.record_delete_view, name='record_delete'),
 ]
