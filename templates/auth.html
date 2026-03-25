@@ -1,140 +1,144 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}
-  登录与注册 - 减肥打卡系统
-{% endblock %}
+{% block title %}登录与注册 - 减肥打卡系统{% endblock %}
 
 {% block auth_content %}
-  <div class="d-flex align-items-center justify-content-center min-vh-100" style="background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);">
-    <div class="container">
-      <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
-          <div class="text-center mb-4">
-            <h2 class="fw-bold text-dark">🎯减肥管理系统</h2>
-            <p class="text-muted">科学记录，看见你的每一次蜕变</p>
-          </div>
+<div style="display:flex; min-height:100vh;">
 
-          {% if messages %}
-            {% for message in messages %}
-              <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm rounded-3" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-              </div>
-            {% endfor %}
-          {% endif %}
-
-          <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
-            <div class="card-header bg-white pt-4 pb-0 border-0">
-              <ul class="nav nav-tabs nav-justified border-bottom-0" id="authTab" role="tablist">
-                <li class="nav-item" role="presentation">
-                  <button class="nav-link active fw-bold fs-5 text-dark border-0 border-bottom border-3 border-primary bg-white" id="login-tab" data-bs-toggle="tab" data-bs-target="#login-pane" type="button" role="tab">登录</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                  <button class="nav-link text-muted fw-bold fs-5 border-0 bg-white" id="register-tab" data-bs-toggle="tab" data-bs-target="#register-pane" type="button" role="tab">注册</button>
-                </li>
-              </ul>
-            </div>
-
-            <div class="card-body p-4 p-sm-5 bg-white">
-              <div class="tab-content" id="authTabContent">
-                <div class="tab-pane fade show active" id="login-pane" role="tabpanel" tabindex="0">
-                  <form method="POST">
-                    {% csrf_token %}
-                    <input type="hidden" name="action" value="login" />
-                    <div class="form-floating mb-3">
-                      <input type="text" class="form-control bg-light border-0" id="loginUser" name="username" placeholder="用户名" required />
-                      <label for="loginUser">用户名</label>
-                    </div>
-                    <div class="form-floating mb-4">
-                      <input type="password" class="form-control bg-light border-0" id="loginPwd" name="password" placeholder="密码" required />
-                      <label for="loginPwd">密码</label>
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100 py-3 fs-5 rounded-3 shadow-sm">立即登录</button>
-                  </form>
-                </div>
-
-                <div class="tab-pane fade" id="register-pane" role="tabpanel" tabindex="0">
-                  <form method="POST">
-                    {% csrf_token %}
-                    <input type="hidden" name="action" value="register" />
-                    <div class="form-floating mb-3">
-                      <input type="text" class="form-control bg-light border-0" id="regUser" name="username" placeholder="用户名" required />
-                      <label for="regUser">设置用户名</label>
-                    </div>
-                    <div class="row g-2 mb-3">
-                      <div class="col-6">
-                        <div class="form-floating">
-                          <input type="password" class="form-control bg-light border-0" name="password" placeholder="密码" required />
-                          <label>设置密码</label>
-                        </div>
-                      </div>
-                      <div class="col-6">
-                        <div class="form-floating">
-                          <input type="password" class="form-control bg-light border-0" name="confirm_password" placeholder="确认密码" required />
-                          <label>确认密码</label>
-                        </div>
-                      </div>
-                    </div>
-                    <hr class="text-muted my-4" />
-                    <div class="form-floating mb-3">
-                      <select class="form-select bg-light border-0" id="regGender" name="gender" required>
-                        <option value="M" selected>男</option>
-                        <option value="F">女</option>
-                      </select>
-                      <label for="regGender">性别</label>
-                    </div>
-                    <div class="row g-2 mb-4">
-                      <div class="col-4">
-                        <div class="form-floating">
-                          <input type="number" step="0.1" class="form-control bg-light border-0" name="height" placeholder="身高" required />
-                          <label>身高(cm)</label>
-                        </div>
-                      </div>
-                      <div class="col-4">
-                        <div class="form-floating">
-                          <input type="number" step="0.1" class="form-control bg-light border-0" name="initial_weight" placeholder="初始" required />
-                          <label>初始(kg)</label>
-                        </div>
-                      </div>
-                      <div class="col-4">
-                        <div class="form-floating">
-                          <input type="number" step="0.1" class="form-control bg-light border-0" name="target_weight" placeholder="目标" required />
-                          <label>目标(kg)</label>
-                        </div>
-                      </div>
-                    </div>
-                    <button type="submit" class="btn btn-success w-100 py-3 fs-5 rounded-3 shadow-sm">完成注册并登录</button>
-                  </form>
-                </div>
-              </div>
-            </div>
-          </div>
+  <!-- 左侧品牌面板 -->
+  <div style="flex:1; background:linear-gradient(160deg,#1b2c22 0%,#2d5a3d 60%,#1b4030 100%); display:flex; flex-direction:column; justify-content:center; align-items:center; padding:3rem 2.5rem; min-width:0;" class="d-none d-lg-flex">
+    <div style="max-width:340px; text-align:center;">
+      <div style="font-size:3.5rem; margin-bottom:1.25rem;">💪</div>
+      <h2 style="color:#fff; font-weight:800; font-size:1.7rem; margin-bottom:0.75rem; letter-spacing:-0.3px;">减肥打卡系统</h2>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.9rem; line-height:1.75; margin-bottom:2.5rem;">
+        科学记录每一天的体重与热量数据<br>用数据见证你的每一次蜕变
+      </p>
+      <div style="display:flex; flex-direction:column; gap:0.85rem; text-align:left;">
+        <div style="display:flex; align-items:center; gap:0.9rem; color:rgba(255,255,255,0.65); font-size:0.875rem;">
+          <span style="background:rgba(82,183,136,0.25); border-radius:8px; width:32px; height:32px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">📈</span>
+          体重趋势与热量收支可视化
+        </div>
+        <div style="display:flex; align-items:center; gap:0.9rem; color:rgba(255,255,255,0.65); font-size:0.875rem;">
+          <span style="background:rgba(82,183,136,0.25); border-radius:8px; width:32px; height:32px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">🏃</span>
+          基于 BMI 的个性化运动推荐
+        </div>
+        <div style="display:flex; align-items:center; gap:0.9rem; color:rgba(255,255,255,0.65); font-size:0.875rem;">
+          <span style="background:rgba(82,183,136,0.25); border-radius:8px; width:32px; height:32px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">🏆</span>
+          连续打卡解锁专属励志语录
         </div>
       </div>
     </div>
   </div>
+
+  <!-- 右侧表单区 -->
+  <div style="width:460px; min-width:320px; background:#f4f2ed; display:flex; flex-direction:column; justify-content:center; padding:2.5rem 2rem;">
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-3" role="alert" style="border-radius:8px; border-left:4px solid {% if message.tags == 'error' or message.tags == 'danger' %}#e74c3c{% elif message.tags == 'success' %}#52b788{% else %}#f39c12{% endif %}; border-top:none; border-right:none; border-bottom:none; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <div style="background:#fff; border-radius:12px; padding:2rem; border:1px solid #e6e0d6; box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+
+      <!-- Tab 切换 -->
+      <div style="display:flex; border-bottom:2px solid #f0ebe3; margin-bottom:1.75rem;">
+        <button id="loginTab" onclick="switchTab('login')"
+          style="flex:1; padding:0.6rem 0; border:none; background:none; font-weight:700; font-size:0.975rem; cursor:pointer; border-bottom:2px solid #3d8b60; margin-bottom:-2px; color:#1e1e1e;">
+          登录
+        </button>
+        <button id="registerTab" onclick="switchTab('register')"
+          style="flex:1; padding:0.6rem 0; border:none; background:none; font-weight:700; font-size:0.975rem; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-2px; color:#999;">
+          注册
+        </button>
+      </div>
+
+      <!-- 登录表单 -->
+      <div id="loginPane">
+        <form method="POST">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="login" />
+          <div class="mb-3">
+            <label class="form-label">用户名</label>
+            <input type="text" name="username" class="form-control" placeholder="请输入用户名" required />
+          </div>
+          <div class="mb-4">
+            <label class="form-label">密码</label>
+            <input type="password" name="password" class="form-control" placeholder="请输入密码" required />
+          </div>
+          <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">登录</button>
+        </form>
+      </div>
+
+      <!-- 注册表单 -->
+      <div id="registerPane" style="display:none;">
+        <form method="POST">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="register" />
+          <div class="mb-3">
+            <label class="form-label">用户名</label>
+            <input type="text" name="username" class="form-control" placeholder="设置登录用户名" required />
+          </div>
+          <div class="row g-2 mb-4">
+            <div class="col-6">
+              <label class="form-label">密码</label>
+              <input type="password" name="password" class="form-control" placeholder="设置密码" required />
+            </div>
+            <div class="col-6">
+              <label class="form-label">确认密码</label>
+              <input type="password" name="confirm_password" class="form-control" placeholder="再次输入" required />
+            </div>
+          </div>
+          <!-- 身体信息区块 -->
+          <div style="background:#f4f2ed; border-radius:8px; padding:1rem 1rem 0.5rem; margin-bottom:1.25rem;">
+            <div style="font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#999; margin-bottom:0.75rem;">身体信息</div>
+            <div class="mb-2">
+              <label class="form-label">性别</label>
+              <select name="gender" class="form-select form-select-sm">
+                <option value="M">男</option>
+                <option value="F">女</option>
+              </select>
+            </div>
+            <div class="row g-2 mb-2">
+              <div class="col-4">
+                <label class="form-label" style="font-size:0.75rem;">身高 (cm)</label>
+                <input type="number" step="0.1" name="height" class="form-control form-control-sm" placeholder="170" required />
+              </div>
+              <div class="col-4">
+                <label class="form-label" style="font-size:0.75rem;">初始 (kg)</label>
+                <input type="number" step="0.1" name="initial_weight" class="form-control form-control-sm" placeholder="75" required />
+              </div>
+              <div class="col-4">
+                <label class="form-label" style="font-size:0.75rem;">目标 (kg)</label>
+                <input type="number" step="0.1" name="target_weight" class="form-control form-control-sm" placeholder="65" required />
+              </div>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">完成注册并登录</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
-  <script>
-    // 简单的标签切换样式逻辑
-    document.addEventListener('DOMContentLoaded', function () {
-      const loginTab = document.getElementById('login-tab')
-      const regTab = document.getElementById('register-tab')
-    
-      loginTab.addEventListener('click', function () {
-        this.classList.add('active', 'border-bottom', 'border-3', 'border-primary', 'text-dark')
-        this.classList.remove('text-muted')
-        regTab.classList.remove('active', 'border-bottom', 'border-3', 'border-primary', 'text-dark')
-        regTab.classList.add('text-muted')
-      })
-    
-      regTab.addEventListener('click', function () {
-        this.classList.add('active', 'border-bottom', 'border-3', 'border-primary', 'text-dark')
-        this.classList.remove('text-muted')
-        loginTab.classList.remove('active', 'border-bottom', 'border-3', 'border-primary', 'text-dark')
-        loginTab.classList.add('text-muted')
-      })
-    })
-  </script>
+<script>
+  function switchTab(tab) {
+    var isLogin = tab === 'login';
+    document.getElementById('loginPane').style.display    = isLogin ? '' : 'none';
+    document.getElementById('registerPane').style.display = isLogin ? 'none' : '';
+    var lt = document.getElementById('loginTab');
+    var rt = document.getElementById('registerTab');
+    lt.style.color             = isLogin ? '#1e1e1e' : '#999';
+    lt.style.borderBottomColor = isLogin ? '#3d8b60' : 'transparent';
+    rt.style.color             = isLogin ? '#999' : '#1e1e1e';
+    rt.style.borderBottomColor = isLogin ? 'transparent' : '#3d8b60';
+  }
+</script>
 {% endblock %}

@@ -131,3 +131,6 @@ TEMPLATES[0]['DIRS'] = [os.path.join(BASE_DIR, 'templates')]
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# DeepSeek API Key（替换为你自己的 Key）
+DEEPSEEK_API_KEY = 'sk-3f164bf8763a4d27ae7a0dbac1051c5a'

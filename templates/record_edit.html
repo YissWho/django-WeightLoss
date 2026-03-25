@@ -1,54 +1,51 @@
 {% extends 'base.html' %}
 
-{% block title %}
-  修改记录 - 减肥打卡系统
-{% endblock %}
+{% block title %}修改记录 - 减肥打卡系统{% endblock %}
 
 {% block content %}
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h3 class="mb-0 fw-bold">修改记录 ({{ record.date|date:'Y-m-d' }})</h3>
-  </div>
+<div class="page-header">
+  <h3>修改记录</h3>
+  <span style="font-size:0.82rem; color:#999;">{{ record.date|date:'Y年m月d日' }}</span>
+</div>
 
-  <div class="row">
-    <div class="col-lg-8">
-      <div class="card border-0 shadow-sm rounded-4">
-        <div class="card-body p-4 p-md-5">
-          <form method="POST">
-            {% csrf_token %}
+<div class="row">
+  <div class="col-lg-7">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <form method="POST">
+          {% csrf_token %}
 
-            <div class="row g-4 mb-4">
-              <div class="col-md-12">
-                <div class="form-floating">
-                  <input type="number" step="0.1" class="form-control bg-light border-0" name="weight" value="{{ record.weight }}" required />
-                  <label>当日体重 (kg)</label>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-floating">
-                  <input type="number" class="form-control bg-light border-0" name="calories_in" value="{{ record.calories_in }}" required />
-                  <label>摄入热量 (kcal)</label>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-floating">
-                  <input type="number" class="form-control bg-light border-0" name="calories_out" value="{{ record.calories_out }}" required />
-                  <label>消耗热量 (kcal)</label>
-                </div>
-              </div>
+          <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#999;margin-bottom:0.75rem;">体重记录</div>
+          <div class="mb-4">
+            <label class="form-label">当日体重 (kg)</label>
+            <input type="number" step="0.1" class="form-control" name="weight" value="{{ record.weight }}" required />
+          </div>
+
+          <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#999;margin-bottom:0.75rem;">热量记录</div>
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label">摄入热量 (kcal)</label>
+              <input type="number" class="form-control" name="calories_in" value="{{ record.calories_in }}" required />
             </div>
-
-            <div class="form-floating mb-5">
-              <textarea class="form-control bg-light border-0" name="summary" style="height: 120px">{{ record.summary }}</textarea>
-              <label>减肥小结</label>
+            <div class="col-md-6">
+              <label class="form-label">消耗热量 (kcal)</label>
+              <input type="number" class="form-control" name="calories_out" value="{{ record.calories_out }}" required />
             </div>
+          </div>
 
-            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-              <a href="{% url 'history' %}" class="btn btn-light px-4 rounded-pill">取消</a>
-              <button type="submit" class="btn btn-primary px-5 rounded-pill shadow-sm">保存修改</button>
-            </div>
-          </form>
-        </div>
+          <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#999;margin-bottom:0.75rem;">每日小结</div>
+          <div class="mb-5">
+            <label class="form-label">减肥小结</label>
+            <textarea class="form-control" name="summary" rows="4">{{ record.summary }}</textarea>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:0.75rem;">
+            <a href="{% url 'history' %}" class="btn btn-light px-4" style="border:1px solid #dbd5cb;">取消</a>
+            <button type="submit" class="btn btn-primary px-5 fw-bold">保存修改</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
+</div>
 {% endblock %}

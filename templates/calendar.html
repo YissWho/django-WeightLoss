@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}打卡日历 - 减肥打卡系统{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h3>📅 打卡日历</h3>
+  <span style="font-size:0.82rem; color:#999;">{{ year }} 年 · 共打卡 {{ total_days }} 天</span>
+</div>
+
+<!-- 热力图卡片 -->
+<div class="card shadow-sm mb-4">
+  <div class="card-body p-4">
+    <div style="font-size:0.8rem; color:#7a7a7a; margin-bottom:1rem;">
+      颜色代表当日<strong>热量净值</strong>（摄入 − 消耗）：
+      <span style="color:#52b788; font-weight:600;">绿色</span> = 热量赤字（减脂有效）&nbsp;
+      <span style="color:#e67e22; font-weight:600;">橙色</span> = 热量盈余&nbsp;
+      <span style="color:#bbb;">灰色</span> = 未打卡
+    </div>
+    <div id="calendarChart" style="height: 200px;"></div>
+  </div>
+</div>
+
+<!-- 统计汇总卡片 -->
+<div class="row g-3" id="statsRow">
+  <!-- 由 JS 动态填充 -->
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  var calendarData = {{ calendar_json|safe }};
+  var year = {{ year }};
+
+  // ===== 热力图 =====
+  var chart = echarts.init(document.getElementById('calendarChart'));
+  chart.setOption({
+    tooltip: {
+      formatter: function(p) {
+        if (!p.data) return p.name + '<br/>未打卡';
+        var net = p.data[1];
+        var label = net > 0 ? '热量盈余 +' + net + ' kcal' : '热量赤字 ' + net + ' kcal';
+        return p.name + '<br/>' + label;
+      }
+    },
+    visualMap: {
+      show: true,
+      type: 'piecewise',
+      orient: 'horizontal',
+      left: 'center',
+      bottom: 0,
+      pieces: [
+        { min: -99999, max: -500, label: '大赤字(< -500)', color: '#1a7a4a' },
+        { min: -500,   max: 0,    label: '小赤字',         color: '#52b788' },
+        { min: 0,      max: 500,  label: '小盈余',         color: '#f0a870' },
+        { min: 500,    max: 99999,label: '大盈余(> 500)',  color: '#e67e22' },
+      ],
+      textStyle: { fontSize: 11, color: '#999' },
+    },
+    calendar: {
+      top: 20,
+      left: 40,
+      right: 40,
+      bottom: 40,
+      cellSize: ['auto', 18],
+      range: String(year),
+      itemStyle: {
+        borderWidth: 3,
+        borderColor: '#f4f2ed',
+        color: '#e6e0d6',
+      },
+      yearLabel: { show: false },
+      monthLabel: {
+        nameMap: ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],
+        color: '#999',
+        fontSize: 11,
+      },
+      dayLabel: {
+        firstDay: 1,
+        nameMap: ['日','一','二','三','四','五','六'],
+        color: '#bbb',
+        fontSize: 10,
+      },
+    },
+    series: [{
+      type: 'heatmap',
+      coordinateSystem: 'calendar',
+      data: calendarData,
+    }]
+  });
+
+  window.addEventListener('resize', function() { chart.resize(); });
+
+  // ===== 统计卡片（纯 JS 计算，不需要额外请求）=====
+  var totalDays  = calendarData.length;
+  var deficitDays = calendarData.filter(function(d) { return d[1] < 0; }).length;
+  var surplusDays = totalDays - deficitDays;
+  var totalDeficit = calendarData.reduce(function(sum, d) { return sum + (d[1] < 0 ? -d[1] : 0); }, 0);
+
+  var statsRow = document.getElementById('statsRow');
+  var stats = [
+    { icon: '📅', label: '本年打卡天数', value: totalDays + ' 天',    color: '#3d8b60' },
+    { icon: '✅', label: '热量赤字天数', value: deficitDays + ' 天',  color: '#52b788' },
+    { icon: '⚠️', label: '热量盈余天数', value: surplusDays + ' 天',  color: '#e67e22' },
+    { icon: '🔥', label: '累计消耗赤字', value: totalDeficit + ' kcal', color: '#3498db' },
+  ];
+
+  stats.forEach(function(s) {
+    var col = document.createElement('div');
+    col.className = 'col-sm-6 col-lg-3';
+    col.innerHTML =
+      '<div class="card shadow-sm h-100" style="border-left:4px solid ' + s.color + ' !important;">' +
+        '<div class="card-body p-4">' +
+          '<div class="stat-label">' + s.icon + ' ' + s.label + '</div>' +
+          '<div class="stat-value" style="color:#1b2c22; font-size:1.6rem;">' + s.value + '</div>' +
+        '</div>' +
+      '</div>';
+    statsRow.appendChild(col);
+  });
+</script>
+{% endblock %}

@@ -13,4 +13,6 @@ urlpatterns = [
     path('history/', views.history_view, name='history'),
     path('history/edit/<int:record_id>/', views.record_edit_view, name='record_edit'),
     path('history/delete/<int:record_id>/', views.record_delete_view, name='record_delete'),
+    path('ai_chat/', views.ai_chat_view, name='ai_chat'),
+    path('calendar/', views.calendar_view, name='calendar'),
 ]

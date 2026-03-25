@@ -3,10 +3,14 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
-from core.models import UserProfile,DailyRecord
+from django.http import JsonResponse
+from django.conf import settings
+from core.models import UserProfile, DailyRecord, Inspiration, ExerciseRecommendation
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from datetime import timedelta
+import json
+import urllib.request
 
 # 登录注册视图（合并在一起，前端通过隐藏字段区分）
 def auth_view(request):
@@ -63,8 +67,51 @@ def auth_view(request):
 
 @login_required(login_url='/auth/')
 def home_view(request):
-    # 渲染刚才新建的 home.html
-    return render(request, 'home.html')
+    user = request.user
+    profile = user.userprofile
+    today = timezone.now().date()
+    thirty_days_ago = today - timedelta(days=30)
+
+    records = list(DailyRecord.objects.filter(user=user, date__gte=thirty_days_ago).order_by('date'))
+
+    dates = [r.date.strftime('%m-%d') for r in records]
+    weights = [r.weight for r in records]
+    calories_in = [r.calories_in for r in records]
+    calories_out = [r.calories_out for r in records]
+
+    # 目标进度：(初始体重 - 当前最新体重) / (初始体重 - 目标体重) * 100%
+    latest_weight = records[-1].weight if records else profile.initial_weight
+    initial = profile.initial_weight
+    target = profile.target_weight
+    if initial != target:
+        progress = round((initial - latest_weight) / (initial - target) * 100, 1)
+        progress = max(0, min(100, progress))
+    else:
+        progress = 0
+
+    # 励志系统：找到 streak_count 能解锁的最高级语录
+    inspiration = Inspiration.objects.filter(
+        unlock_days__lte=profile.streak_count
+    ).order_by('-unlock_days').first()
+
+    # BMI 运动推荐：根据当前 BMI 匹配区间
+    bmi = profile.get_bmi()
+    exercise_rec = ExerciseRecommendation.objects.filter(
+        min_bmi__lte=bmi, max_bmi__gte=bmi
+    ).first()
+
+    context = {
+        'dates_json': json.dumps(dates),
+        'weights_json': json.dumps(weights),
+        'calories_in_json': json.dumps(calories_in),
+        'calories_out_json': json.dumps(calories_out),
+        'latest_weight': latest_weight,
+        'progress': progress,
+        'inspiration': inspiration,
+        'exercise_rec': exercise_rec,
+        'bmi': bmi,
+    }
+    return render(request, 'home.html', context)
 
 def logout_view(request):
     logout(request)
@@ -81,6 +128,7 @@ def profile_edit_view(request):
         gender = request.POST.get('gender')
         height = request.POST.get('height')
         target_weight = request.POST.get('target_weight')
+        initial_weight = request.POST.get('initial_weight')
 
         # 2. 更新资料
         profile.gender = gender
@@ -88,6 +136,8 @@ def profile_edit_view(request):
             profile.height = float(height)
         if target_weight:
             profile.target_weight = float(target_weight)
+        if initial_weight:
+            profile.initial_weight = float(initial_weight)
 
         # 3. 处理头像文件上传 (关键点：从 request.FILES 获取)
         if 'avatar' in request.FILES:
@@ -161,3 +211,82 @@ def record_delete_view(request, record_id):
         record.delete()
         messages.success(request, '记录已删除')
     return redirect('history')
+
+
+@login_required(login_url='/auth/')
+def ai_chat_view(request):
+    if request.method == 'POST':
+        try:
+            body = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': '请求格式错误'}, status=400)
+
+        user_message = body.get('message', '').strip()
+        history = body.get('history', [])  # 前端维护的多轮对话历史
+
+        if not user_message:
+            return JsonResponse({'error': '消息不能为空'}, status=400)
+
+        profile = request.user.userprofile
+        bmi = profile.get_bmi()
+        gender_str = '男' if profile.gender == 'M' else '女'
+        system_prompt = (
+            f"你是一位专业的减肥健康顾问。用户基本信息：性别{gender_str}、"
+            f"身高{profile.height}cm、当前体重{profile.initial_weight}kg、"
+            f"目标体重{profile.target_weight}kg、BMI {bmi}、"
+            f"已连续打卡{profile.streak_count}天。"
+            "请根据用户实际情况给出科学、实用、鼓励性的减肥建议，回答简洁易懂。"
+        )
+
+        # 构造多轮对话消息列表
+        api_messages = [{"role": "system", "content": system_prompt}]
+        api_messages.extend(history)
+        api_messages.append({"role": "user", "content": user_message})
+
+        payload = json.dumps({
+            "model": "deepseek-chat",
+            "messages": api_messages,
+            "max_tokens": 1024,
+        }).encode()
+
+        req = urllib.request.Request(
+            'https://api.deepseek.com/chat/completions',
+            data=payload,
+            headers={
+                'Content-Type': 'application/json',
+                'Authorization': f'Bearer {settings.DEEPSEEK_API_KEY}',
+            }
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                result = json.loads(resp.read())
+            reply = result['choices'][0]['message']['content']
+            return JsonResponse({'reply': reply})
+        except Exception:
+            return JsonResponse({'error': 'AI 服务暂时不可用，请稍后重试。'}, status=500)
+
+    return render(request, 'ai_chat.html')
+
+
+@login_required(login_url='/auth/')
+def calendar_view(request):
+    user = request.user
+    year = timezone.now().year
+
+    records = DailyRecord.objects.filter(
+        user=user, date__year=year
+    ).values('date', 'calories_in', 'calories_out')
+
+    # ECharts calendar 数据格式：[日期字符串, 净摄入热量]
+    # 正数 = 热量盈余（摄入>消耗），负数 = 赤字（消耗>摄入，减脂有效）
+    calendar_data = [
+        [r['date'].strftime('%Y-%m-%d'), r['calories_in'] - r['calories_out']]
+        for r in records
+    ]
+
+    context = {
+        'calendar_json': json.dumps(calendar_data),
+        'year': year,
+        'total_days': len(calendar_data),
+    }
+    return render(request, 'calendar.html', context)
