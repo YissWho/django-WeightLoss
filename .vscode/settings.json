@@ -1,0 +1,4 @@
+{
+  "prettier.enable": false,
+  "python.defaultInterpreterPath": "${workspaceFolder}\\venv\\Scripts\\python.exe"
+}
